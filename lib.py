@@ -17,7 +17,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 # the OAuth 2.0 information for this application.
 
 CLIENT_SECRETS_FILE = ".secrets/client_secret.json"
-PICKLE_FILE = '.secrets/token.pickle'
+PICKLE_FILE = '.secrets/youtube_token.pickle'
 YOUTUBE_UPLOAD_SCOPE = "https://www.googleapis.com/auth/youtube.upload"
 
 def get_tokens(token_path=PICKLE_FILE, fetch=False, client_secrets_file=CLIENT_SECRETS_FILE):
