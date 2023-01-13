@@ -10,8 +10,14 @@ python -m venv .venv
 install all the dependencies
 ```
 pip install --upgrade google-auth google-auth-oauthlib google-auth-httplib2
-pip install google-api-python-client
+pip install --upgrade google-api-python-client
 pip install --upgrade google-cloud-texttospeech
+```
+
+or just run
+
+```
+pip install -r requirements.txt
 ```
 
 
