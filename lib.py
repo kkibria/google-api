@@ -13,14 +13,18 @@ import pickle
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 
+
+YOUTUBE_UPLOAD_SCOPE = "youtube.upload"
+CLOUD_PLATFORM_SCOPE = "cloud-platform"
+
 # The CLIENT_SECRETS_FILE variable specifies the name of a file that contains
 # the OAuth 2.0 information for this application.
 
 CLIENT_SECRETS_FILE = ".secrets/client_secret.json"
-PICKLE_FILE = '.secrets/youtube_token.pickle'
-YOUTUBE_UPLOAD_SCOPE = "https://www.googleapis.com/auth/youtube.upload"
 
-def get_tokens(token_path=PICKLE_FILE, fetch=False, client_secrets_file=CLIENT_SECRETS_FILE):
+
+def get_tokens(fetch=False, client_secrets_file=CLIENT_SECRETS_FILE, scope=None):
+    token_path = f'.secrets/{scope}_token.pickle'
     credentials = None
 
     # token.pickle stores the user's credentials from previously successful logins
@@ -43,7 +47,7 @@ def get_tokens(token_path=PICKLE_FILE, fetch=False, client_secrets_file=CLIENT_S
             flow = InstalledAppFlow.from_client_secrets_file(
                 client_secrets_file,
                 scopes=[
-                    YOUTUBE_UPLOAD_SCOPE
+                    f"https://www.googleapis.com/auth/{scope}"
                 ]
             )
             flow.run_local_server(port=8080, prompt='consent',
@@ -83,18 +87,15 @@ YOUTUBE_API_VERSION = "v3"
 VALID_PRIVACY_STATUSES = ("public", "private", "unlisted")
 
 
-def get_authenticated_service(token_path=PICKLE_FILE):
-    credentials = get_tokens(token_path=token_path)
+def get_authenticated_service(scope=YOUTUBE_UPLOAD_SCOPE):
+    credentials = get_tokens(scope=scope)
     return build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
                  credentials=credentials)
-                #  http=httplib2.Http())
+    #  http=httplib2.Http())
 
 
 def initialize_upload(youtube, options):
-    tags = None
-    if options.keywords:
-        tags = options.keywords.split(",")
-
+    tags = options.keywords.split(",") if options.keywords else None
     body = dict(
         snippet=dict(
             title=options.title,
@@ -127,10 +128,11 @@ def resumable_upload(insert_request):
             status, response = insert_request.next_chunk()
             if response is not None:
                 if 'id' in response:
-                    print("Video id '%s' was successfully uploaded." %
-                          response['id'])
+                    print(
+                        f"Video id '{response['id']}' was successfully uploaded.")
                 else:
-                    exit("The upload failed with an unexpected response: %s" % response)
+                    exit(
+                        f"The upload failed with an unexpected response: {response}")
         except HttpError as e:
             if e.resp.status in RETRIABLE_STATUS_CODES:
                 error = "A retriable HTTP error %d occurred:\n%s" % (e.resp.status,
@@ -138,7 +140,7 @@ def resumable_upload(insert_request):
             else:
                 raise
         except RETRIABLE_EXCEPTIONS as e:
-            error = "A retriable error occurred: %s" % e
+            error = f"A retriable error occurred: {e}"
 
         if error is not None:
             print(error)
