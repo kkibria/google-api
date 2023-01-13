@@ -2,17 +2,16 @@ from http import client
 import httplib2
 import os
 import random
-import sys
+# import sys
 import time
-
-from apiclient.discovery import build
-from apiclient.errors import HttpError
-from apiclient.http import MediaFileUpload
-
 import pickle
+
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+from googleapiclient.http import MediaFileUpload
+
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
-
 
 YOUTUBE_UPLOAD_SCOPE = "youtube.upload"
 CLOUD_PLATFORM_SCOPE = "cloud-platform"
@@ -77,7 +76,6 @@ RETRIABLE_EXCEPTIONS = (httplib2.HttpLib2Error, IOError, client.NotConnected,
 # Always retry when an apiclient.errors.HttpError with one of these status
 # codes is raised.
 RETRIABLE_STATUS_CODES = [500, 502, 503, 504]
-
 
 # This OAuth 2.0 access scope allows an application to upload files to the
 # authenticated user's YouTube channel, but doesn't allow other types of access.
